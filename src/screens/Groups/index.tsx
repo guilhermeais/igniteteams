@@ -1,9 +1,10 @@
-import { Header } from '@components/Header'
-import { Container } from './styles'
-import { Highlight } from '@components/Highlight'
+import { EmptyList } from '@components/EmptyList'
 import { GroupCard } from '@components/GroupCard'
-import { useEffect, useState } from 'react'
+import { Header } from '@components/Header'
+import { Highlight } from '@components/Highlight'
+import { useState } from 'react'
 import { FlatList } from 'react-native'
+import { Container } from './styles'
 
 type Group = {
   title: string
@@ -11,19 +12,6 @@ type Group = {
 
 export function Groups() {
   const [groups, setGroups] = useState<Group[]>([])
-
-  useEffect(
-    () =>
-      setGroups([
-        {
-          title: 'Turma A',
-        },
-        {
-          title: 'Turma B',
-        },
-      ]),
-    []
-  )
 
   return (
     <Container>
@@ -34,6 +22,10 @@ export function Groups() {
       <FlatList
         data={groups}
         keyExtractor={(item, i) => `${item.title}-${i}`}
+        contentContainerStyle={!groups.length && { flex: 1 }}
+        ListEmptyComponent={() => (
+          <EmptyList emptyMessage="Que tal cadastrar a primeira turma?" />
+        )}
         renderItem={({ item }) => <GroupCard title={item.title} />}
       />
     </Container>
