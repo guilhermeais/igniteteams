@@ -5,6 +5,7 @@ import { Highlight } from '@components/Highlight'
 import { useState } from 'react'
 import { FlatList } from 'react-native'
 import { Container } from './styles'
+import { Button } from '@components/Button'
 
 type Group = {
   title: string
@@ -28,6 +29,8 @@ export function Groups() {
         )}
         renderItem={({ item }) => <GroupCard title={item.title} />}
       />
+
+      <Button title='Criar nova turma' />
     </Container>
   )
 }
