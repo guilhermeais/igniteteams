@@ -10,6 +10,7 @@ import { FlatList } from 'react-native'
 import { Container, Form, HeaderList, TeamSize } from './styles'
 import { Button } from '@components/Button'
 import { ButtonTypeStyle } from '@components/Button/styles'
+import { useRoute } from '@react-navigation/native'
 
 type Team = {
   name: string
@@ -17,23 +18,11 @@ type Team = {
 }
 
 export function Players() {
-  const [teams, setTeams] = useState<Team[]>([
-    {
-      name: 'Time A',
-      players: [],
-    },
-    {
-      name: 'Time B',
-      players: [],
-    },
-  ])
-
-  const [selectedTeam, setSelectedTeam] = useState<Team>(teams[0])
-
-  const [newPlayerName, setNewPlayerName] = useState('')
+  const [teams, setTeams] = useState<Team[]>([])
+  const [selectedTeam, setSelectedTeam] = useState<Team>(teams?.[0] || null)
 
   function isTeamSelected(team: Team) {
-    return team.name === selectedTeam?.name
+    return team?.name === selectedTeam?.name
   }
 
   function removePlayer(player: Player) {
@@ -47,6 +36,8 @@ export function Players() {
     }
   }
 
+  const [newPlayerName, setNewPlayerName] = useState('')
+
   function addPlayer() {
     selectedTeam.players.push({
       name: newPlayerName,
@@ -56,14 +47,14 @@ export function Players() {
     setNewPlayerName('')
   }
 
+  const route = useRoute()
+  const { group } = route.params as Players.RouteParams
+
   return (
     <Container>
       <Header showBackButton />
 
-      <Highlight
-        title="Nome da Turma"
-        subtitle="adicione a galera e separe os times"
-      />
+      <Highlight title={group} subtitle="adicione a galera e separe os times" />
 
       <Form>
         <Input
@@ -90,11 +81,11 @@ export function Players() {
           )}
         />
 
-        <TeamSize>{selectedTeam.players.length}</TeamSize>
+        <TeamSize>{selectedTeam?.players?.length}</TeamSize>
       </HeaderList>
 
       <FlatList
-        data={selectedTeam.players}
+        data={selectedTeam?.players || []}
         ListEmptyComponent={() => (
           <EmptyList emptyMessage="Não há pessoas nesse time" />
         )}
@@ -106,11 +97,17 @@ export function Players() {
           {
             paddingBottom: 100,
           },
-          !selectedTeam.players.length ? { flexGrow: 1 } : {},
+          !selectedTeam?.players?.length ? { flexGrow: 1 } : {},
         ]}
       />
 
-      <Button title='Remover turma' type={ButtonTypeStyle.SECONDARY}/>
+      <Button title="Remover turma" type={ButtonTypeStyle.SECONDARY} />
     </Container>
   )
+}
+
+export namespace Players {
+  export type RouteParams = {
+    group: string
+  }
 }

@@ -40,3 +40,7 @@ export function Groups() {
     </Container>
   )
 }
+
+export namespace Groups {
+  export type RouteParams = undefined
+}

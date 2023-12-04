@@ -6,9 +6,9 @@ import { Players } from '@screens/Players'
 const { Navigator, Screen } = createNativeStackNavigator()
 
 export type AppRoutesList = {
-  Groups: React.ComponentProps<typeof Groups>
-  NewGroup: React.ComponentProps<typeof NewGroup>
-  Players: React.ComponentProps<typeof Players>
+  Groups: Groups.RouteParams
+  NewGroup: NewGroup.RouteParams
+  Players: Players.RouteParams
 }
 
 export function AppRoutes() {

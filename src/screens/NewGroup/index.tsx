@@ -12,7 +12,7 @@ export function NewGroup() {
   const navigation = useNavigation()
 
   function handleCreateGroup() {
-    navigation.navigate('Players')
+    navigation.navigate('Players', { group: newGroupName })
   }
 
   return (
@@ -31,11 +31,16 @@ export function NewGroup() {
           placeholder="Nome da turma"
           style={{ marginBottom: 20 }}
           value={newGroupName}
-          onChangeText={t => setNewGroupName(t)}
+          onChangeText={setNewGroupName}
+          onEndEditing={handleCreateGroup}
         />
 
         <Button title="Criar" onPress={handleCreateGroup} />
       </Content>
     </Container>
   )
+}
+
+export namespace NewGroup {
+  export type RouteParams = undefined
 }
