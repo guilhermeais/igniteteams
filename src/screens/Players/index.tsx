@@ -12,16 +12,16 @@ import { Button } from '@components/Button'
 import { ButtonTypeStyle } from '@components/Button/styles'
 import { useRoute } from '@react-navigation/native'
 
-type Team = {
+export type Group = {
   name: string
   players: Player[]
 }
 
 export function Players() {
-  const [teams, setTeams] = useState<Team[]>([])
-  const [selectedTeam, setSelectedTeam] = useState<Team>(teams?.[0] || null)
+  const [teams, setTeams] = useState<Group[]>([])
+  const [selectedTeam, setSelectedTeam] = useState<Group>(teams?.[0] || null)
 
-  function isTeamSelected(team: Team) {
+  function isTeamSelected(team: Group) {
     return team?.name === selectedTeam?.name
   }
 

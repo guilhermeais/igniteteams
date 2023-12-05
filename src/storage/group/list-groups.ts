@@ -1,0 +1,18 @@
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { Group } from '@screens/Players'
+import { GROUP_COLLECTION } from '@storage/storage-config'
+
+export async function listGroups(): Promise<Group[]> {
+  try {
+    const currentGroupsString = await AsyncStorage.getItem(GROUP_COLLECTION)
+    if (!currentGroupsString) {
+      throw new Error('No groups found')
+    }
+
+    const currentGroups: Group[] = JSON.parse(currentGroupsString) || []
+
+    return currentGroups
+  } catch (error) {
+    throw error
+  }
+}
