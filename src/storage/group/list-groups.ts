@@ -5,11 +5,10 @@ import { GROUP_COLLECTION } from '@storage/storage-config'
 export async function listGroups(): Promise<Group[]> {
   try {
     const currentGroupsString = await AsyncStorage.getItem(GROUP_COLLECTION)
-    if (!currentGroupsString) {
-      throw new Error('No groups found')
-    }
 
-    const currentGroups: Group[] = JSON.parse(currentGroupsString) || []
+    const currentGroups: Group[] = currentGroupsString
+      ? JSON.parse(currentGroupsString)
+      : []
 
     return currentGroups
   } catch (error) {

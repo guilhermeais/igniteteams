@@ -3,18 +3,34 @@ import { Group } from '@screens/Players'
 import { GROUP_COLLECTION } from '@storage/storage-config'
 import { listGroups } from './list-groups'
 
-export async function createGroup(newGroupName: string): Promise<void> {
+export async function upsertGroup(newGroup: Group): Promise<void> {
   try {
-    const currentGroups: Group[] = await listGroups()
+    const storedGroups: Group[] = await listGroups()
 
-    const newGroup: Group = {
-      name: newGroupName,
-      players: [],
+    const groupIsAlreadyStored = storedGroups.find(
+      group => group.name === newGroup.name
+    )
+
+    if (groupIsAlreadyStored) {
+      const updatedGroups = storedGroups.map(group => {
+        if (group.name === newGroup.name) {
+          return newGroup
+        }
+
+        return group
+      })
+
+      await AsyncStorage.setItem(
+        GROUP_COLLECTION,
+        JSON.stringify(updatedGroups)
+      )
+
+      return
     }
 
     await AsyncStorage.setItem(
       GROUP_COLLECTION,
-      JSON.stringify([...currentGroups, newGroup])
+      JSON.stringify([...storedGroups, newGroup])
     )
   } catch (error) {
     throw error

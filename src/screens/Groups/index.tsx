@@ -1,16 +1,14 @@
+import { Button } from '@components/Button'
 import { EmptyList } from '@components/EmptyList'
 import { GroupCard } from '@components/GroupCard'
 import { Header } from '@components/Header'
 import { Highlight } from '@components/Highlight'
-import { useState } from 'react'
+import { useFocusEffect, useNavigation } from '@react-navigation/native'
+import { Group } from '@screens/Players'
+import { listGroups } from '@storage/group/list-groups'
+import { useCallback, useState } from 'react'
 import { FlatList } from 'react-native'
 import { Container } from './styles'
-import { Button } from '@components/Button'
-import { useNavigation } from '@react-navigation/native'
-
-type Group = {
-  title: string
-}
 
 export function Groups() {
   const [groups, setGroups] = useState<Group[]>([])
@@ -20,6 +18,25 @@ export function Groups() {
     navigation.navigate('NewGroup')
   }
 
+  async function fetchGroups() {
+    try {
+      console.log('🚀 fetching stored groups...')
+      const storedGroups = await listGroups()
+
+      console.log('🚀 stored groups fetched!', storedGroups)
+
+      setGroups(storedGroups)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchGroups()
+    }, [])
+  )
+
   return (
     <Container>
       <Header />
@@ -28,12 +45,12 @@ export function Groups() {
 
       <FlatList
         data={groups}
-        keyExtractor={(item, i) => `${item.title}-${i}`}
+        keyExtractor={(item, i) => `${item.name}-${i}`}
         contentContainerStyle={!groups.length && { flex: 1 }}
         ListEmptyComponent={() => (
           <EmptyList emptyMessage="Que tal cadastrar a primeira turma?" />
         )}
-        renderItem={({ item }) => <GroupCard title={item.title} />}
+        renderItem={({ item }) => <GroupCard title={item.name} />}
       />
 
       <Button title="Criar nova turma" onPress={handleNewGroup} />

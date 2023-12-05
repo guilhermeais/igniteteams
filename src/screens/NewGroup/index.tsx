@@ -5,14 +5,26 @@ import { Input } from '@components/Input'
 import { useNavigation } from '@react-navigation/native'
 import { useState } from 'react'
 import { Container, Content, Icon } from './styles'
+import { upsertGroup } from '@storage/group/create-group'
+import { Group } from '@screens/Players'
 
 export function NewGroup() {
   const [newGroupName, setNewGroupName] = useState('')
 
   const navigation = useNavigation()
 
-  function handleCreateGroup() {
-    navigation.navigate('Players', { group: newGroupName })
+  async function handleCreateGroup() {
+    try {
+      const newGroup: Group = {
+        name: newGroupName,
+        players: [],
+      }
+
+      await upsertGroup(newGroup)
+      navigation.navigate('Players', { group: newGroupName })
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   return (
