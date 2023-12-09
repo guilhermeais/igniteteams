@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native'
 import { useState } from 'react'
 import { Container, Content, Icon } from './styles'
 import { createGroup } from '@storage/group/create-group'
-import { Group } from 'src/models/Group'
+import { Group } from 'src/models/group'
 import { AppError } from '@utils/app.error'
 import { Alert } from 'react-native'
 

@@ -1,6 +1,6 @@
-import { Team } from 'src/models/team'
-import { getGroupByName } from './get-group-by-name'
-import { updateGroup } from './update-group'
+import { Team } from '../../models/team'
+import { getGroupByName } from '../group/get-group-by-name'
+import { updateGroup } from '../group/update-group'
 import { AppError } from '@utils/app.error'
 
 export async function removeTeamFromGroup(groupName: string, team: Team) {

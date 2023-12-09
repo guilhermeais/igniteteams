@@ -14,10 +14,12 @@ import { Player } from 'src/models/player'
 import { Team } from 'src/models/team'
 import { BottomList, Container, Form, HeaderList, TeamSize } from './styles'
 import { getGroupByName } from '@storage/group/get-group-by-name'
-import { Group } from 'src/models/Group'
-import { addTeamToGroup } from '@storage/group/add-team-to-group'
-import { removeTeamFromGroup } from '@storage/group/remove-team-from-group'
+import { Group } from '../../models/group'
+import { addTeamToGroup } from '@storage/team/add-team-to-group'
+import { removeTeamFromGroup } from '@storage/team/remove-team-from-group'
 import { AppError } from '@utils/app.error'
+import { addPlayerOnTeam } from '@storage/player/add-player-on-team'
+import { removePlayerFromTeam } from '@storage/player/remove-player-from-team'
 
 export function Players() {
   const [group, setGroup] = useState<Group>()
@@ -54,42 +56,72 @@ export function Players() {
     return team?.name === selectedTeam?.name
   }
 
-  function removePlayer(player: Player) {
-    if (!selectedTeam) {
-      return
-    }
+  const [newPlayerName, setNewPlayerName] = useState('')
 
-    const playerIndex = selectedTeam.players.findIndex(
-      p => p.name === player.name
-    )
+  async function handleAddPlayer() {
+    try {
+      if (!selectedTeam) {
+        if (!teams?.length) {
+          Alert.alert('Ops!', 'Você precisa criar um time primeiro.')
+        } else {
+          Alert.alert(
+            'Ops!',
+            'Você precisa selecionar um time para adicionar uma pessoa.'
+          )
+        }
 
-    if (playerIndex !== -1) {
-      selectedTeam.players.splice(playerIndex, 1)
+        return
+      }
+
+      const newPlayer: Player = {
+        name: newPlayerName,
+      }
+
+      console.log(
+        `🚀 Adding a new player (${newPlayer.name}) to the team (${selectedTeam.name})`
+      )
+
+      await addPlayerOnTeam(newPlayer, groupName, selectedTeam.name)
+      selectedTeam.players.push(newPlayer)
+
       setTeams([...teams])
+
+      setNewPlayerName('')
+    } catch (error) {
+      if (AppError.isAppError(error)) {
+        Alert.alert('Ops!', error.message)
+      }
+
+      console.error(
+        'An error occurred while trying to add a new player to the team.',
+        error
+      )
     }
   }
 
-  const [newPlayerName, setNewPlayerName] = useState('')
+  async function handleRemovePlayer(player: Player) {
+    try {
+      const { name: playerName } = player
+      const playerIndex = selectedTeam!.players.findIndex(
+        p => p.name === playerName
+      )
 
-  function addPlayer() {
-    if (!selectedTeam) {
-      if (!teams?.length) {
-        Alert.alert('Ops!', 'Você precisa criar um time primeiro.')
-      } else {
-        Alert.alert(
-          'Ops!',
-          'Você precisa selecionar um time para adicionar uma pessoa.'
-        )
+      if (playerIndex !== -1) {
+        await removePlayerFromTeam(playerName, groupName, selectedTeam!.name)
+
+        selectedTeam!.players.splice(playerIndex, 1)
+        setTeams([...teams])
+      }
+    } catch (error) {
+      if (AppError.isAppError(error)) {
+        Alert.alert('Ops!', error.message)
       }
 
-      return
+      console.error(
+        'An error occurred while trying to remove a player from the team.',
+        error
+      )
     }
-    selectedTeam.players.push({
-      name: newPlayerName,
-    })
-
-    setTeams([...teams])
-    setNewPlayerName('')
   }
 
   async function handleAddTeam() {
@@ -100,7 +132,13 @@ export function Players() {
       }
 
       await addTeamToGroup(groupName, newTeam)
+      const isOnlyTeam = !teams?.length
+
       setTeams([...teams, newTeam])
+
+      if (isOnlyTeam) {
+        setSelectedTeam(newTeam)
+      }
     } catch (error) {
       console.log(error)
     }
@@ -162,9 +200,13 @@ export function Players() {
           autoCorrect={false}
           value={newPlayerName}
           onChangeText={text => setNewPlayerName(text)}
-          onEndEditing={addPlayer}
+          onSubmitEditing={handleAddPlayer}
         />
-        <ButtonIcon style={{ flexGrow: 0.2 }} icon="add" onPress={addPlayer} />
+        <ButtonIcon
+          style={{ flexGrow: 0.2 }}
+          icon="add"
+          onPress={handleAddPlayer}
+        />
       </Form>
 
       <HeaderList>
@@ -203,7 +245,10 @@ export function Players() {
           <EmptyList emptyMessage="Não há pessoas nesse time" />
         )}
         renderItem={({ item: player }) => (
-          <PlayerCard player={player} onRemove={() => removePlayer(player)} />
+          <PlayerCard
+            player={player}
+            onRemove={() => handleRemovePlayer(player)}
+          />
         )}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
