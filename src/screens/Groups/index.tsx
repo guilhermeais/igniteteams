@@ -4,7 +4,7 @@ import { GroupCard } from '@components/GroupCard'
 import { Header } from '@components/Header'
 import { Highlight } from '@components/Highlight'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
-import { Group } from '@screens/Players'
+import { Group } from 'src/models/Group'
 import { listGroups } from '@storage/group/list-groups'
 import { useCallback, useState } from 'react'
 import { FlatList } from 'react-native'
@@ -16,6 +16,10 @@ export function Groups() {
 
   function handleNewGroup() {
     navigation.navigate('NewGroup')
+  }
+
+  function handleOpenGroup(groupName: string) {
+    navigation.navigate('Players', { group: groupName })
   }
 
   async function fetchGroups() {
@@ -50,7 +54,12 @@ export function Groups() {
         ListEmptyComponent={() => (
           <EmptyList emptyMessage="Que tal cadastrar a primeira turma?" />
         )}
-        renderItem={({ item }) => <GroupCard title={item.name} />}
+        renderItem={({ item }) => (
+          <GroupCard
+            onPress={() => handleOpenGroup(item.name)}
+            title={item.name}
+          />
+        )}
       />
 
       <Button title="Criar nova turma" onPress={handleNewGroup} />

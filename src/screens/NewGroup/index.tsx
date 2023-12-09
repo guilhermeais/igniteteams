@@ -5,8 +5,10 @@ import { Input } from '@components/Input'
 import { useNavigation } from '@react-navigation/native'
 import { useState } from 'react'
 import { Container, Content, Icon } from './styles'
-import { upsertGroup } from '@storage/group/create-group'
-import { Group } from '@screens/Players'
+import { createGroup } from '@storage/group/create-group'
+import { Group } from 'src/models/Group'
+import { AppError } from '@utils/app.error'
+import { Alert } from 'react-native'
 
 export function NewGroup() {
   const [newGroupName, setNewGroupName] = useState('')
@@ -17,13 +19,29 @@ export function NewGroup() {
     try {
       const newGroup: Group = {
         name: newGroupName,
-        players: [],
+        teams: [
+          {
+            name: 'Time A',
+            players: [],
+          },
+          {
+            name: 'Time B',
+            players: [],
+          },
+        ],
       }
 
-      await upsertGroup(newGroup)
+      await createGroup(newGroup)
       navigation.navigate('Players', { group: newGroupName })
     } catch (error) {
       console.error(error)
+
+      if (AppError.isAppError(error)) {
+        Alert.alert(`Novo Grupo`, error.message)
+        return
+      }
+
+      Alert.alert(`Novo Grupo`, `Não foi possível criar um novo grupo.`)
     }
   }
 
@@ -44,7 +62,6 @@ export function NewGroup() {
           style={{ marginBottom: 20 }}
           value={newGroupName}
           onChangeText={setNewGroupName}
-          onEndEditing={handleCreateGroup}
         />
 
         <Button title="Criar" onPress={handleCreateGroup} />

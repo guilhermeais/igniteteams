@@ -1,10 +1,16 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { Group } from '@screens/Players'
+import { Group } from 'src/models/Group'
 import { GROUP_COLLECTION } from '@storage/storage-config'
 import { listGroups } from './list-groups'
+import { AppError } from '@utils/app.error'
+import { GroupAlreadyExistsError } from '@utils/errors/group-already-exists.error'
 
-export async function upsertGroup(newGroup: Group): Promise<void> {
+export async function createGroup(newGroup: Group): Promise<void> {
   try {
+    if (!newGroup.name.trim().length) {
+      throw new AppError('Informe o nome da turma')
+    }
+
     const storedGroups: Group[] = await listGroups()
 
     const groupIsAlreadyStored = storedGroups.find(
@@ -12,20 +18,7 @@ export async function upsertGroup(newGroup: Group): Promise<void> {
     )
 
     if (groupIsAlreadyStored) {
-      const updatedGroups = storedGroups.map(group => {
-        if (group.name === newGroup.name) {
-          return newGroup
-        }
-
-        return group
-      })
-
-      await AsyncStorage.setItem(
-        GROUP_COLLECTION,
-        JSON.stringify(updatedGroups)
-      )
-
-      return
+      throw new GroupAlreadyExistsError(newGroup.name)
     }
 
     await AsyncStorage.setItem(

@@ -25,7 +25,16 @@ export const HeaderList = styled.View`
   flex-direction: row;
   align-items: center;
 
-  margin: 32px 0 12px;
+  margin: 15px 0 12px;
+`
+
+export const BottomList = styled.View`
+  width: 100%;
+
+  flex-direction: row;
+  align-items: center;
+
+  justify-content: space-between;
 `
 
 export const TeamSize = styled.Text`

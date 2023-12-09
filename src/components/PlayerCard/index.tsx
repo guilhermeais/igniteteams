@@ -1,10 +1,7 @@
 import { ButtonIcon } from '@components/ButtonIcon'
 import { Container, PlayerIcon, Name } from './styles'
 import { ButtonIconTypeStyle } from '@components/ButtonIcon/styles'
-
-export type Player = {
-  name: string
-}
+import { Player } from "src/models/player"
 
 export type PlayerCardProps = {
   player: Player
